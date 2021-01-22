@@ -1,0 +1,21 @@
+<ul>
+  <li *ngFor="let todo of todoItems$ |async">
+    <input type="checkbox" [ngModel]="todo.isCompleted" (click)="toggleStatus(todo)">
+    {{ todo.title }}
+  </li>
+</ul>
+<hr>
+<ul>
+  <li *ngFor="let todo of completedItems$ |async">
+    <input type="checkbox" [ngModel]="todo.isCompleted" (click)="toggleStatus(todo)">
+    {{ todo.title }}
+  </li>
+</ul>
+<hr>
+<button (click)="dump()">Dump</button>
+<button (click)="restore()">Restore</button>
+<button (click)="remove()">Remove</button>
+<div class="form-group">
+  <input [(ngModel)]="newTodo" type="text">
+  <button (click)="addNewTodo()">Create</button>
+</div>

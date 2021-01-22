@@ -1,39 +1,21 @@
-import { RxCollectionCreator } from './../../../../../rxdb/src/types/rx-collection.d';
 import { Injectable, isDevMode } from '@angular/core';
-import todoSchema from '../schemas/todo.schema';
 import { createRxDatabase, addRxPlugin } from 'rxdb/plugins/core';
 import { RxDBNoValidatePlugin } from 'rxdb/plugins/no-validate';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
+import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
 import { RxDBReplicationPlugin } from 'rxdb/plugins/replication';
-import * as PouchdbAdapterHttp from 'pouchdb-adapter-http';
+import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump';
+import { RxDBEncryptionPlugin } from 'rxdb/plugins/encryption';
 import * as PouchdbAdapterIdb from 'pouchdb-adapter-idb';
-import RxTodoDocumentType, { TodoType } from '../types/documents/todo.rx-document';
-import RxTodoDatabase, { RxAppCollectionsType } from '../types/RxDB';
-import RxTodoDatabaseType from '../types/RxDB';
-
-const collections: RxCollectionCreator[] = [
-    {
-        name: 'todos',
-        schema: todoSchema,
-        methods: {
-            hpPercent(this: RxTodoDocumentType): number {
-                return 67;
-            }
-        },
-    }
-];
-
-console.log('hostname: ' + window.location.hostname);
-const syncURL = 'http://' + window.location.hostname + ':10101/';
-
-let doSync = true;
-if (window.location.hash == '#nosync') doSync = false;
-
+import dbCollections from '../database.collections';
+import RxAppDatabaseType, { RxAppCollectionsType } from '../types/RxDB';
 
 async function loadRxDBPlugins(): Promise<any> {
   addRxPlugin(RxDBLeaderElectionPlugin);
+  addRxPlugin(RxDBUpdatePlugin);
   addRxPlugin(RxDBReplicationPlugin);
-  addRxPlugin(PouchdbAdapterHttp);
+  addRxPlugin(RxDBJsonDumpPlugin);
+  addRxPlugin(RxDBEncryptionPlugin);
   addRxPlugin(PouchdbAdapterIdb);
 
   if (isDevMode()) {
@@ -50,14 +32,16 @@ async function loadRxDBPlugins(): Promise<any> {
   }
 }
 
-async function _create(): Promise<RxTodoDatabase> {
+async function _create(): Promise<RxAppDatabaseType> {
   await loadRxDBPlugins();
 
   console.log('DatabaseService: creating database..');
   const db = await createRxDatabase<RxAppCollectionsType>({
-    name: 'todoTestdb',
-    adapter: 'idb'
-    // password: 'myLongAndStupidPassword' // no password needed
+    name: 'appdb',           // <- name
+    adapter: 'idb',          // <- storage-adapter
+    password: 'TacticVITIProject',     // <- password (optional)
+    multiInstance: false,         // <- multiInstance (optional, default: true)
+    eventReduce: true // <- eventReduce (optional, default: true)
   });
   console.log('DatabaseService: created database');
   (window as any)['db'] = db; // write to window for debugging
@@ -71,36 +55,12 @@ async function _create(): Promise<RxTodoDatabase> {
 
   // create collections
   console.log('DatabaseService: create collections');
-  await Promise.all(collections.map(colData => db.addCollections(colData)));
-
-  // hooks
-  console.log('DatabaseService: add hooks');
-  db.collections.todos.preInsert(function (docObj: TodoType) {
-      const id = docObj.id;
-      return db.collections.todos
-          .findOne({ selector: { id } })
-          .exec()
-          .then((has: RxTodoDocumentType | null) => {
-              if (has != null) {
-                  alert('another todo already has the Id ' + id);
-                  throw new Error('id already there');
-              }
-              return db;
-          });
-  }, false);
-
-  // sync with server
-  if (doSync) {
-      console.log('DatabaseService: sync');
-      await db.todos.sync({
-          remote: syncURL + '/hero'
-      });
-  }
+  await Promise.all(dbCollections.map(colData => db.addCollections(colData)));
 
   return db;
 }
 
-let DB_INSTANCE: RxTodoDatabaseType;
+let DB_INSTANCE: RxAppDatabaseType;
 
 /**
  * This is run via APP_INITIALIZER in app.module.ts
@@ -112,8 +72,24 @@ export async function initDatabase() {
 }
 
 @Injectable()
-export class DatabaseService {
-    get db(): RxTodoDatabaseType {
-        return DB_INSTANCE;
-    }
+export class DatabaseHardService {
+  get db(): RxAppDatabaseType {
+    return DB_INSTANCE;
+  }
+
+  async dumpDb(): Promise<void> {
+    const dump = await DB_INSTANCE.dump();
+    console.dir(dump);
+    console.log('db dump created successfuly');
+  }
+
+  async restoreDb(): Promise<void> {
+    await DB_INSTANCE.remove();
+    // await this.database.importDump({});
+    console.log('db restored successfuly');
+  }
+  async clearDb(): Promise<void> {
+    await DB_INSTANCE.remove();
+    console.log('db deleted successfuly');
+  }
 }

@@ -1,9 +1,17 @@
 import { RxDocument } from "rxdb";
 
+export enum SyncStatusEnum {
+  Synced = 1,
+  Syncing,
+  NeedSync,
+};
+
 export type TodoType = {
     id: string;
     title: string;
     isCompleted: boolean;
+    syncDate: Date | null;
+    syncStatus: SyncStatusEnum;
 }
 
 // ORM methods
