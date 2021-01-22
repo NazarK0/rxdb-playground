@@ -1,13 +1,11 @@
-import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import RxDbService from './database/services/rxdb.service';
 import TodoModule from './todo/todo.module';
-import { initDatabase, DatabaseHardService } from './database/services/databasehard.service';
+import { initDatabase, AppDbService } from './database/app.db.service';
 
 @NgModule({
   declarations: [
@@ -27,8 +25,7 @@ import { initDatabase, DatabaseHardService } from './database/services/databaseh
       multi: true,
       deps: [/* your dependencies */]
     },
-    DatabaseHardService,
-    // RxDbService,
+    AppDbService,
   ],
   bootstrap: [AppComponent]
 })

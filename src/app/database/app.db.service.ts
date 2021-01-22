@@ -1,3 +1,4 @@
+import { RxCollection } from 'rxdb';
 import { Injectable, isDevMode } from '@angular/core';
 import { createRxDatabase, addRxPlugin } from 'rxdb/plugins/core';
 import { RxDBNoValidatePlugin } from 'rxdb/plugins/no-validate';
@@ -7,8 +8,9 @@ import { RxDBReplicationPlugin } from 'rxdb/plugins/replication';
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump';
 import { RxDBEncryptionPlugin } from 'rxdb/plugins/encryption';
 import * as PouchdbAdapterIdb from 'pouchdb-adapter-idb';
-import dbCollections from '../database.collections';
-import RxAppDatabaseType, { RxAppCollectionsType } from '../types/RxDB';
+import dbCollections from './database.collections';
+import RxAppDatabaseType, { RxAppCollectionsType } from './RxDB';
+import RxCollectionsEnum from './collections.enum';
 
 async function loadRxDBPlugins(): Promise<any> {
   addRxPlugin(RxDBLeaderElectionPlugin);
@@ -50,7 +52,6 @@ async function _create(): Promise<RxAppDatabaseType> {
   db.waitForLeadership()
     .then(() => {
       console.log('isLeader now');
-      document.title = '♛ ' + document.title;
     });
 
   // create collections
@@ -72,9 +73,13 @@ export async function initDatabase() {
 }
 
 @Injectable()
-export class DatabaseHardService {
+export class AppDbService {
   get db(): RxAppDatabaseType {
     return DB_INSTANCE;
+  }
+
+  collection(collection: RxCollectionsEnum): RxCollection {
+    return DB_INSTANCE[collection];
   }
 
   async dumpDb(): Promise<void> {

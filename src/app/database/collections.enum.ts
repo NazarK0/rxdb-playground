@@ -1,5 +1,5 @@
 enum RxCollectionsEnum {
-  Todo = 'todo',
+  Todos = 'todos',
 }
 
 export default RxCollectionsEnum;

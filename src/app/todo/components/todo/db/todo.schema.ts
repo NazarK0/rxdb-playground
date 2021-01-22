@@ -1,7 +1,5 @@
-import { SyncStatusEnum } from './../types/documents/todo.rx-document';
-
 import { RxJsonSchema } from 'rxdb';
-import { TodoType } from '../types/documents/todo.rx-document';
+import TodoType from 'src/app/todo/types/todo.type';
 
 const todoSchema: RxJsonSchema<TodoType> = {
   title: 'todo schema',
@@ -22,12 +20,6 @@ const todoSchema: RxJsonSchema<TodoType> = {
       type: 'boolean',
       default: false,
     },
-    syncDate: {
-      type: 'string',
-    },
-    syncStatus: {
-      type: 'number'
-    }
   },
 };
 

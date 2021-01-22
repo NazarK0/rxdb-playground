@@ -1,4 +1,4 @@
-import todoSchema from "./schemas/todo.schema";
+import todoSchema from "../todo/components/todo/db/todo.schema";
 
 const dbCollections: any[] = [
     {

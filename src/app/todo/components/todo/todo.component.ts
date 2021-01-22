@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
-import { DatabaseHardService } from "src/app/database/services/databasehard.service";
-import { TodoType } from "src/app/database/types/documents/todo.rx-document";
-import TodoDbService from "./services/todo.db.service";
+import { AppDbService } from "src/app/database/app.db.service";
+import TodoType from "../../types/todo.type";
+import TodoDbService from "./db/todo.db.service";
 
 @Component({
   selector: 'app-todo',
@@ -18,16 +18,12 @@ export default class TodoComponent implements OnInit {
 
   constructor(
     private todoDbService: TodoDbService,
-    private appDbService: DatabaseHardService,
+    private appDbService: AppDbService,
     ) {}
 
   async ngOnInit(): Promise<void> {
     this.todoItems$ = this.todoDbService.getTodoItems();
     this.completedItems$ = this.todoDbService.getDoneTodoItems();
-
-    this.todoDbService.getTodoItems().subscribe((data) => {
-      console.log('data', data)
-    })
   }
 
   async addNewTodo(): Promise<void> {
