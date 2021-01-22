@@ -1,21 +1,29 @@
 <ul>
   <li *ngFor="let todo of todoItems$ |async">
-    <input type="checkbox" [ngModel]="todo.isCompleted" (click)="toggleStatus(todo)">
-    {{ todo.title }}
+    <mat-checkbox [ngModel]="todo.isCompleted" (click)="toggleStatus(todo)">
+      {{ todo.title }}
+    </mat-checkbox>
   </li>
 </ul>
 <hr>
 <ul>
   <li *ngFor="let todo of completedItems$ |async">
-    <input type="checkbox" [ngModel]="todo.isCompleted" (click)="toggleStatus(todo)">
-    {{ todo.title }}
+    <mat-checkbox [ngModel]="todo.isCompleted" (click)="toggleStatus(todo)">
+      {{ todo.title }}
+    </mat-checkbox>
+    <!-- <input type="checkbox" [ngModel]="todo.isCompleted" (click)="toggleStatus(todo)">
+    {{ todo.title }} -->
   </li>
 </ul>
 <hr>
-<button (click)="dump()">Dump</button>
-<button (click)="restore()">Restore</button>
-<button (click)="remove()">Remove</button>
+<button mat-raised-button (click)="dump()" color="primary">Dump</button>
+<button mat-raised-button (click)="restore()" color="primary">Restore</button>
+<button mat-raised-button (click)="remove()" color="warn">Remove</button>
 <div class="form-group">
-  <input [(ngModel)]="newTodo" type="text">
-  <button (click)="addNewTodo()">Create</button>
+  <mat-form-field class="example-full-width">
+    <mat-label>Create new todo</mat-label>
+    <input matInput [(ngModel)]="newTodo" type="text">
+  </mat-form-field>
+  
+  <button mat-raised-button (click)="addNewTodo()" color="accent">Create</button>
 </div>
